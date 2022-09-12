@@ -81,7 +81,7 @@ const Post: React.FC<Props> = (props) => {
         }
       </div>
       <div>
-        {props.comments.map((comment) => {
+        {props.comments?.map((comment) => {
           <Comment comment={comment} />
         })}
       </div>

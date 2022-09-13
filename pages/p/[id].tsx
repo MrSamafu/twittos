@@ -9,7 +9,6 @@ import { PostProps } from '../../components/Post';
 import { useSession } from 'next-auth/react';
 import prisma from '../../lib/prisma';
 import Comment, { CommentProps } from '../../components/Comment';
-import { json } from 'stream/consumers';
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 

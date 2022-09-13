@@ -7,15 +7,22 @@ import prisma from '../../../lib/prisma';
 // Required fields in body: postId,comment,userId
 // Optional fields in body: content
 export default async function handle(req, res) {
-  const { postId, comment, userId } = req.body;
+  const { postId, comment }: {postId: string; comment: string} = req.body;
 
   const session = await getSession({ req });
+
+  const userEmail = session?.user.email
+
+  if(userEmail){
   const result = await prisma.comments.create({
+    //@ts-ignore
     data: {
-      postId: postId,
-      comment: comment,
-      userId: userId,
+      post: { connect: { id: postId}},
+      comment,
+      user: { connect: { email: userEmail } },
     },
   });
-  res.json(result);
+  res.status(201).json(result);} else {
+    res.status(401).json({error: "not authorized"})
+  }
 }

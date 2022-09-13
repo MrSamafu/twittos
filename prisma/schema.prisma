@@ -82,12 +82,12 @@ model VerificationToken {
 
 model Comments {
   id            String    @id @default(cuid())
-  userId        String    @map("user_id")
-  postId        String    
+  userId        String?   @map("user_id")
+  postId        String?    
   comment       String    
   createdAt     DateTime  @default(now()) @map(name: "created_at")
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  post          Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user          User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post          Post?     @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@map("comments")
 }

@@ -55,8 +55,9 @@ async function deletePost(id: string): Promise<void> {
 
 type Props = {
   post: PostProps;
-  comments: CommentProps[];
+  jsonComments: CommentProps[];
 }
+
 const Post: React.FC<Props> = (props) => {
   const [comment, setComment] = useState('');
   const { data: session, status } = useSession();
@@ -69,16 +70,18 @@ const Post: React.FC<Props> = (props) => {
   if (!props.post.published) {
     title = `${title} (Draft)`;
   }
-  console.log(props);
 
   async function publishComment(e: FormEvent): Promise<void> {
     const id = props.post.id;
     e.preventDefault();
     await fetch(`/api/comment`, {
       method: 'POST',
+      headers: new Headers({
+        "Content-Type": "application/json"
+      }),
       body: JSON.stringify({
         'postId': id,
-        'comment': comment
+        'comment': comment,
       })
     });
     Router.push(`/p/${props.post.id}`);
@@ -110,8 +113,9 @@ const Post: React.FC<Props> = (props) => {
         </form>
       </div>
       <div>
-        {props.comments?.map((comment) => {
-          <Comment comment={comment} />
+        {
+        props.jsonComments?.map((comment) => {
+          return <Comment comment={comment} key={comment.id}/>
         })}
       </div>
       <style jsx>{`

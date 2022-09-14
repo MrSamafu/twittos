@@ -1,5 +1,6 @@
-import React, { FormEvent } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import { useSession } from 'next-auth/react';
+import Router from "next/router";
 
 export type CommentProps = {
   id: string;
@@ -13,14 +14,16 @@ export type CommentProps = {
 }
 
 const Comment: React.FC<{ comment: CommentProps }> = ({ comment }) => {
+  const [connectedUser,setConnectedUser] = useState(false);
   const { data: session, status } = useSession();
+
   async function deleteComment(e: FormEvent): Promise<void> {
     e.preventDefault();
-    console.log('email user session',session?.user?.email);
-    getIdUser();
-    console.log('comment userId',comment.userId);
-    const id = comment.id
-    //console.log(id);
+    await fetch(`/api/comment/${comment.id}`, {
+      method: 'DELETE',
+    })
+    await Router.push(`/p/${comment.postId}`)
+
   }
 
   async function getIdUser(): Promise<void>{
@@ -34,14 +37,18 @@ const Comment: React.FC<{ comment: CommentProps }> = ({ comment }) => {
       })
     });
     const userId = await res.text();
-    console.log('userId',userId);
+    userId == comment.userId ? setConnectedUser(true) : setConnectedUser(false);
   }
+
+  useEffect(()=>{
+    status !== 'unauthenticated' ? getIdUser() : null
+  },[])
 
   return (
     <div>
       <p>{comment.comment}</p>
       <p>{comment.user.name}</p>
-      <button onClick={deleteComment}>Supprimer</button>
+      {connectedUser ? <button onClick={deleteComment}>Supprimer</button> : null}
     </div>
   );
 };

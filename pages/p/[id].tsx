@@ -60,6 +60,7 @@ type Props = {
 const Post: React.FC<Props> = (props) => {
   const [comment, setComment] = useState('');
   const { data: session, status } = useSession();
+  console.log(status);
   if (status === 'loading') {
     return <div>Authenticating ...</div>;
   }
@@ -83,8 +84,8 @@ const Post: React.FC<Props> = (props) => {
         'comment': comment,
       })
     });
+    setComment('');
     Router.push(`/p/${props.post.id}`);
-    console.log(comment);
   }
   return (
     <Layout>
@@ -100,7 +101,7 @@ const Post: React.FC<Props> = (props) => {
         )
         }
       </div>
-      <div>
+      {status === 'unauthenticated' ? null : <div>
         <form onSubmit={publishComment}>
           <input
             type="text"
@@ -110,7 +111,7 @@ const Post: React.FC<Props> = (props) => {
           />
           <button type='submit'>Envoyer</button>
         </form>
-      </div>
+      </div>}
       <div>
         {
         props.jsonComments?.map((comment) => {

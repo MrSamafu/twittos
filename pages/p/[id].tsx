@@ -1,17 +1,16 @@
 // pages/p/[id].tsx
 
-import React, { FormEvent, useState } from 'react';
-import { GetServerSideProps } from 'next';
-import ReactMarkdown from 'react-markdown';
-import Router from 'next/router';
-import Layout from '../../components/Layout';
-import { PostProps } from '../../components/Post';
-import { useSession } from 'next-auth/react';
-import prisma from '../../lib/prisma';
-import Comment, { CommentProps } from '../../components/Comment';
+import React, { FormEvent, useState } from "react";
+import { GetServerSideProps } from "next";
+import ReactMarkdown from "react-markdown";
+import Router from "next/router";
+import Layout from "../../components/Layout";
+import { PostProps } from "../../components/Post";
+import { useSession } from "next-auth/react";
+import prisma from "../../lib/prisma";
+import Comment, { CommentProps } from "../../components/Comment";
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
-
   const post = await prisma.post.findUnique({
     where: {
       id: String(params?.id),
@@ -28,11 +27,11 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
     },
     include: {
       user: {
-        select: { name: true }
-      }
-    }
-  })
-  let jsonComments: String = JSON.parse(JSON.stringify(comments))
+        select: { name: true },
+      },
+    },
+  });
+  let jsonComments: String = JSON.parse(JSON.stringify(comments));
   return {
     props: { post, jsonComments },
   };
@@ -40,28 +39,27 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 
 async function publishPost(id: string): Promise<void> {
   await fetch(`/api/publish/${id}`, {
-    method: 'PUT',
+    method: "PUT",
   });
-  await Router.push('/');
+  await Router.push("/");
 }
 async function deletePost(id: string): Promise<void> {
   await fetch(`/api/post/${id}`, {
-    method: 'DELETE',
+    method: "DELETE",
   });
-  Router.push('/');
+  Router.push("/");
 }
-
 
 type Props = {
   post: PostProps;
   jsonComments: CommentProps[];
-}
+};
 
 const Post: React.FC<Props> = (props) => {
-  const [comment, setComment] = useState('');
+  const [comment, setComment] = useState("");
   const { data: session, status } = useSession();
   console.log(status);
-  if (status === 'loading') {
+  if (status === "loading") {
     return <div>Authenticating ...</div>;
   }
   const userHasValidSession = Boolean(session);
@@ -75,47 +73,47 @@ const Post: React.FC<Props> = (props) => {
     const id = props.post.id;
     e.preventDefault();
     await fetch(`/api/comment`, {
-      method: 'POST',
+      method: "POST",
       headers: new Headers({
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       }),
       body: JSON.stringify({
-        'postId': id,
-        'comment': comment,
-      })
+        postId: id,
+        comment: comment,
+      }),
     });
-    setComment('');
+    setComment("");
     Router.push(`/p/${props.post.id}`);
   }
   return (
     <Layout>
       <div>
         <h2>{title}</h2>
-        <p>By {props.post?.author?.name || 'Unknown author'}</p>
+        <p>By {props.post?.author?.name || "Unknown author"}</p>
         <ReactMarkdown children={props.post.content} />
         {!props.post.published && userHasValidSession && postBelongsToUser && (
           <button onClick={() => publishPost(props.post.id)}>Publish</button>
         )}
         {userHasValidSession && postBelongsToUser && (
           <button onClick={() => deletePost(props.post.id)}>Delete</button>
-        )
-        }
+        )}
       </div>
-      {status === 'unauthenticated' ? null : <div>
-        <form onSubmit={publishComment}>
-          <input
-            type="text"
-            placeholder='Commentaire'
-            value={comment}
-            onChange={ e => setComment(e.currentTarget.value)}
-          />
-          <button type='submit'>Envoyer</button>
-        </form>
-      </div>}
+      {status === "unauthenticated" ? null : (
+        <div>
+          <form onSubmit={publishComment}>
+            <input
+              type="text"
+              placeholder="Commentaire"
+              value={comment}
+              onChange={(e) => setComment(e.currentTarget.value)}
+            />
+            <button type="submit">Envoyer</button>
+          </form>
+        </div>
+      )}
       <div>
-        {
-        props.jsonComments?.map((comment) => {
-          return <Comment comment={comment} key={comment.id}/>
+        {props.jsonComments?.map((comment) => {
+          return <Comment comment={comment} key={comment.id} />;
         })}
       </div>
       <style jsx>{`

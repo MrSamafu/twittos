@@ -1,6 +1,7 @@
 import React, { FormEvent, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import Router from "next/router";
+import Link from "next/link";
 
 export type CommentProps = {
   id: string;
@@ -46,7 +47,10 @@ const Comment: React.FC<{ comment: CommentProps }> = ({ comment }) => {
   return (
     <div>
       <p>{comment.comment}</p>
-      <p>{comment.user.name}</p>
+      <button onClick={() => Router.push(`/account/${comment.userId}`)}>
+        {comment.user.name}
+      </button>
+
       {connectedUser ? (
         <button onClick={deleteComment}>Supprimer</button>
       ) : null}

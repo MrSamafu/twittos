@@ -1,57 +1,67 @@
 // pages/create.tsx
 
-import React, { useState } from 'react';
-import Layout from '../components/Layout';
-import Router from 'next/router';
+import React, { useState } from "react";
+import Layout from "../components/Layout";
+import Router from "next/router";
+import { Button, Grid, Text } from "@nextui-org/react";
 
 const Draft: React.FC = () => {
-    const [title, setTitle] = useState('');
-    const [content, setContent] = useState('');
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
 
-    // /pages/create.tsx
+  // /pages/create.tsx
 
-    const submitData = async (e: React.SyntheticEvent) => {
-        e.preventDefault();
-        try {
-            const body = { title, content };
-            await fetch('/api/post', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body),
-            });
-            await Router.push('/drafts');
-        } catch (error) {
-            console.error(error);
-        }
-    };
+  const submitData = async () => {
+    try {
+      const body = { title, content };
+      await fetch("/api/post", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      await Router.push("/drafts");
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-
-    return (
-        <Layout>
-            <div>
-                <form onSubmit={submitData}>
-                    <h1>New Draft</h1>
-                    <input
-                        autoFocus
-                        onChange={(e) => setTitle(e.target.value)}
-                        placeholder="Title"
-                        type="text"
-                        value={title}
-                    />
-                    <textarea
-                        cols={50}
-                        onChange={(e) => setContent(e.target.value)}
-                        placeholder="Content"
-                        rows={8}
-                        value={content}
-                    />
-                    <input disabled={!content || !title} type="submit" value="Create" />
-                    <a className="back" href="#" onClick={() => Router.push('/')}>
-                        or Cancel
-                    </a>
-                </form>
-            </div>
-            <style jsx>{`
+  return (
+    <Layout>
+      <Grid.Container gap={2} direction="column">
+        <Grid>
+          <Text h1>New Draft</Text>
+          <input
+            autoFocus
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Title"
+            type="text"
+            value={title}
+          />
+          <textarea
+            cols={50}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder="Content"
+            rows={8}
+            value={content}
+          />
+        </Grid>
+        <Grid direction="column">
+          <Button
+            auto
+            color="primary"
+            disabled={
+              !content || content.trim() === "" || !title || title.trim() === ""
+            }
+            onPress={() => submitData()}
+          >
+            Create
+          </Button>
+          <a className="back" href="#" onClick={() => Router.push("/")}>
+            Cancel
+          </a>
+        </Grid>
+      </Grid.Container>
+      <style jsx>{`
         .page {
           background: var(--geist-background);
           padding: 3rem;
@@ -60,7 +70,7 @@ const Draft: React.FC = () => {
           align-items: center;
         }
 
-        input[type='text'],
+        input[type="text"],
         textarea {
           width: 100%;
           padding: 0.5rem;
@@ -69,7 +79,7 @@ const Draft: React.FC = () => {
           border: 0.125rem solid rgba(0, 0, 0, 0.2);
         }
 
-        input[type='submit'] {
+        input[type="submit"] {
           background: #ececec;
           border: 0;
           padding: 1rem 2rem;
@@ -79,8 +89,8 @@ const Draft: React.FC = () => {
           margin-left: 1rem;
         }
       `}</style>
-        </Layout>
-    );
+    </Layout>
+  );
 };
 
 export default Draft;

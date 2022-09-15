@@ -1,11 +1,12 @@
 // pages/drafts.tsx
 
-import React from 'react';
-import { GetServerSideProps } from 'next';
-import { useSession, getSession } from 'next-auth/react';
-import Layout from '../components/Layout';
-import Post, { PostProps } from '../components/Post';
-import prisma from '../lib/prisma';
+import React from "react";
+import { GetServerSideProps } from "next";
+import { useSession, getSession } from "next-auth/react";
+import Layout from "../components/Layout";
+import Post, { PostProps } from "../components/Post";
+import prisma from "../lib/prisma";
+import { Card, Grid } from "@nextui-org/react";
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const session = await getSession({ req });
@@ -50,28 +51,18 @@ const Drafts: React.FC<Props> = (props) => {
     <Layout>
       <div className="page">
         <h1>My Drafts</h1>
-        <main>
+        <Grid.Container gap={2}>
           {props.drafts.map((post) => (
-            <div key={post.id} className="post">
-              <Post post={post} />
-            </div>
+            <Grid xs={12} key={post.id}>
+              <Card isPressable isHoverable variant="bordered">
+                <Card.Body>
+                  <Post post={post} />
+                </Card.Body>
+              </Card>
+            </Grid>
           ))}
-        </main>
+        </Grid.Container>
       </div>
-      <style jsx>{`
-        .post {
-          background: var(--geist-background);
-          transition: box-shadow 0.1s ease-in;
-        }
-
-        .post:hover {
-          box-shadow: 1px 1px 3px #aaa;
-        }
-
-        .post + .post {
-          margin-top: 2rem;
-        }
-      `}</style>
     </Layout>
   );
 };

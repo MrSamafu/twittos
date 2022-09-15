@@ -3,6 +3,7 @@ import { GetStaticProps } from "next";
 import Layout from "../components/Layout";
 import Post, { PostProps } from "../components/Post";
 import prisma from "../lib/prisma";
+import { Card, Grid } from "@nextui-org/react";
 
 export const getStaticProps: GetStaticProps = async () => {
   const feed = await prisma.post.findMany({
@@ -28,28 +29,18 @@ const Blog: React.FC<Props> = (props) => {
     <Layout>
       <div className="page">
         <h1>Public Feed</h1>
-        <main>
+        <Grid.Container gap={2}>
           {props.feed.map((post) => (
-            <div key={post.id} className="post">
-              <Post post={post} />
-            </div>
+            <Grid xs={12}>
+              <Card key={post.id} isPressable isHoverable variant="bordered">
+                <Card.Body>
+                  <Post post={post} />
+                </Card.Body>
+              </Card>
+            </Grid>
           ))}
-        </main>
+        </Grid.Container>
       </div>
-      <style jsx>{`
-        .post {
-          background: white;
-          transition: box-shadow 0.1s ease-in;
-        }
-
-        .post:hover {
-          box-shadow: 1px 1px 3px #aaa;
-        }
-
-        .post + .post {
-          margin-top: 2rem;
-        }
-      `}</style>
     </Layout>
   );
 };

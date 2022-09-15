@@ -3,6 +3,7 @@ import Router from "next/router";
 import ReactMarkdown from "react-markdown";
 import { GetServerSideProps, GetStaticProps } from "next";
 import prisma from "../lib/prisma";
+import { Text } from "@nextui-org/react";
 
 /*export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const comments = await prisma.comments.findMany({
@@ -29,7 +30,7 @@ const Post: React.FC<{ post: PostProps }> = ({ post }) => {
   const authorName = post.author ? post.author.name : "Unknown author";
   return (
     <div onClick={() => Router.push("/p/[id]", `/p/${post.id}`)}>
-      <h2>{post.title}</h2>
+      <Text h2>{post.title}</Text>
       <small>By {authorName}</small>
       <ReactMarkdown children={post.content} />
       <p>Commentaire</p>

@@ -5,6 +5,7 @@ import Post, { PostProps } from "../../components/Post";
 import prisma from "../../lib/prisma";
 import { useSession } from "next-auth/react";
 import { getStaticProps } from "..";
+import { Button, Card, Grid, Row, Text } from "@nextui-org/react";
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const userData = await prisma.user.findUnique({
@@ -62,30 +63,34 @@ const Account: React.FC<{ userData: UserProps }> = ({ userData }) => {
 
   return (
     <Layout>
-      <div className="page">
-        {userId === userData.id ? <h1>My Account</h1> : <h1>Account</h1>}
-        <main>
-          <h2>{userData.name}</h2>
-          <p>{userData.email}</p>
-          <p>Comments send: {userData.comments.length}</p>
-          <p>Posts written: {userData.posts.length}</p>
-          {userId === userData.id ? <button>Edit</button> : null}
-        </main>
-      </div>
-      <style jsx>{`
-        .post {
-          background: white;
-          transition: box-shadow 0.1s ease-in;
-        }
-
-        .post:hover {
-          box-shadow: 1px 1px 3px #aaa;
-        }
-
-        .post + .post {
-          margin-top: 2rem;
-        }
-      `}</style>
+      <Grid.Container gap={2}>
+        <Grid sm={12} md={5}>
+          <Card>
+            <Card.Header>
+              {userId === userData.id ? (
+                <Text h1>My Account</Text>
+              ) : (
+                <Text h1>Account</Text>
+              )}
+            </Card.Header>
+            <Card.Divider />
+            <Card.Body>
+              <Text h2>{userData.name}</Text>
+              <Text>Email: {userData.email}</Text>
+              <Text>Comments send: {userData.comments.length}</Text>
+              <Text>Posts written: {userData.posts.length}</Text>
+            </Card.Body>
+            <Card.Divider />
+            <Card.Footer>
+              <Row justify="flex-end">
+                {userId === userData.id ? (
+                  <Button size="sm">Edit</Button>
+                ) : null}
+              </Row>
+            </Card.Footer>
+          </Card>
+        </Grid>
+      </Grid.Container>
     </Layout>
   );
 };

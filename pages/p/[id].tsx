@@ -10,7 +10,7 @@ import { useSession } from "next-auth/react";
 import prisma from "../../lib/prisma";
 import Comment, { CommentProps } from "../../components/Comment";
 import { Button, Card, Grid, Input } from "@nextui-org/react";
-
+import { IoPaperPlane } from "react-icons/io5";
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const post = await prisma.post.findUnique({
     where: {
@@ -59,7 +59,6 @@ type Props = {
 const Post: React.FC<Props> = (props) => {
   const [comment, setComment] = useState("");
   const { data: session, status } = useSession();
-  console.log(status);
   if (status === "loading") {
     return <div>Authenticating ...</div>;
   }
@@ -70,9 +69,8 @@ const Post: React.FC<Props> = (props) => {
     title = `${title} (Draft)`;
   }
 
-  async function publishComment(e: FormEvent): Promise<void> {
+  async function publishComment(): Promise<void> {
     const id = props.post.id;
-    e.preventDefault();
     await fetch(`/api/comment`, {
       method: "POST",
       headers: new Headers({
@@ -88,65 +86,77 @@ const Post: React.FC<Props> = (props) => {
   }
   return (
     <Layout>
-      <Card variant="flat">
-        <Card.Body>
-          <h2>{title}</h2>
-          <p>By {props.post?.author?.name || "Unknown author"}</p>
-          <ReactMarkdown children={props.post.content} />
-          <Button.Group color="gradient" ghost>
-            {!props.post.published && userHasValidSession && postBelongsToUser && (
-              <Button
-                size="lg"
-                color="gradient"
+      <Grid.Container gap={2}>
+        <Grid xs={12}>
+          <Card variant="bordered">
+            <Card.Body>
+              <h2>{title}</h2>
+              <p>By {props.post?.author?.name || "Unknown author"}</p>
+              <ReactMarkdown children={props.post.content} />
+              <Button.Group color="gradient" ghost>
+                {!props.post.published &&
+                  userHasValidSession &&
+                  postBelongsToUser && (
+                    <Button
+                      size="lg"
+                      color="gradient"
+                      bordered
+                      onClick={() => publishPost(props.post.id)}
+                    >
+                      Publish
+                    </Button>
+                  )}
+                {userHasValidSession && postBelongsToUser && (
+                  <Button
+                    size="lg"
+                    color="gradient"
+                    bordered
+                    onClick={() => deletePost(props.post.id)}
+                  >
+                    Delete
+                  </Button>
+                )}
+              </Button.Group>
+            </Card.Body>
+          </Card>
+        </Grid>
+        <Grid xs={12}>
+          {status === "unauthenticated" ? null : (
+            <div>
+              <Input
+                color="primary"
                 bordered
-                onClick={() => publishPost(props.post.id)}
-              >
-                Publish
-              </Button>
-            )}
-            {userHasValidSession && postBelongsToUser && (
-              <Button
-                size="lg"
-                color="gradient"
-                bordered
-                onClick={() => deletePost(props.post.id)}
-              >
-                Delete
-              </Button>
-            )}
-          </Button.Group>
-        </Card.Body>
-      </Card>
-      {status === "unauthenticated" ? null : (
-        <div>
-          <Input
-            clearable
-            contentRightStyling={false}
-            placeholder="Type your comment..."
-            value={comment}
-            onChange={(e) => setComment(e.currentTarget.value)}
-            contentRight={
-              <SendButton>
-                <SendIcon />
-              </SendButton>
-            }
-          />
-          <Button
-            size="lg"
-            color="gradient"
-            bordered
-            type="submit"
-            onClick={publishComment}
-          >
-            Envoyer
-          </Button>
-        </div>
-      )}
-      <Grid.Container>
+                clearable
+                contentRightStyling={false}
+                labelPlaceholder="Comment"
+                placeholder="Type your comment..."
+                value={comment}
+                onChange={(e) => setComment(e.currentTarget.value)}
+                contentRight={
+                  <Button
+                    auto
+                    color="primary"
+                    disabled={!comment || comment.trim() === ""}
+                    rounded
+                    onPress={() => publishComment()}
+                  >
+                    <IoPaperPlane />
+                  </Button>
+                }
+              />
+            </div>
+          )}
+        </Grid>
         <Grid>
-          {props.jsonComments?.map((comment) => {
-            return <Comment comment={comment} key={comment.id} />;
-          })}
+          <Grid.Container gap={2}>
+            {props.jsonComments?.map((comment) => {
+              return (
+                <Grid xs={8} key={comment.id}>
+                  <Comment comment={comment} key={comment.id} />
+                </Grid>
+              );
+            })}
+          </Grid.Container>
         </Grid>
       </Grid.Container>
     </Layout>

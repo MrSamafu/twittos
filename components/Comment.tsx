@@ -20,7 +20,6 @@ const Comment: React.FC<{ comment: CommentProps }> = ({ comment }) => {
   const { data: session, status } = useSession();
 
   async function deleteComment(e: FormEvent): Promise<void> {
-    e.preventDefault();
     await fetch(`/api/comment/${comment.id}`, {
       method: "DELETE",
     });

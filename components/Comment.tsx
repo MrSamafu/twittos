@@ -2,6 +2,7 @@ import React, { FormEvent, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import Router from "next/router";
 import Link from "next/link";
+import { Button, Card } from "@nextui-org/react";
 
 export type CommentProps = {
   id: string;
@@ -45,16 +46,27 @@ const Comment: React.FC<{ comment: CommentProps }> = ({ comment }) => {
   }, []);
 
   return (
-    <div>
-      <p>{comment.comment}</p>
-      <button onClick={() => Router.push(`/account/${comment.userId}`)}>
-        {comment.user.name}
-      </button>
+    <Card css={{ mw: "400px" }}>
+      <Card.Body>
+        <p>{comment.comment}</p>
+        <Button.Group color="gradient" ghost>
+          <Button
+            size="lg"
+            color="gradient"
+            bordered
+            onClick={() => Router.push(`/account/${comment.userId}`)}
+          >
+            {comment.user.name}
+          </Button>
 
-      {connectedUser ? (
-        <button onClick={deleteComment}>Supprimer</button>
-      ) : null}
-    </div>
+          {connectedUser ? (
+            <Button size="lg" color="gradient" bordered onClick={deleteComment}>
+              Supprimer
+            </Button>
+          ) : null}
+        </Button.Group>
+      </Card.Body>
+    </Card>
   );
 };
 

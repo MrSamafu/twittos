@@ -9,6 +9,7 @@ import { PostProps } from "../../components/Post";
 import { useSession } from "next-auth/react";
 import prisma from "../../lib/prisma";
 import Comment, { CommentProps } from "../../components/Comment";
+import { Button, Card, Grid, Input } from "@nextui-org/react";
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const post = await prisma.post.findUnique({
@@ -87,56 +88,67 @@ const Post: React.FC<Props> = (props) => {
   }
   return (
     <Layout>
-      <div>
-        <h2>{title}</h2>
-        <p>By {props.post?.author?.name || "Unknown author"}</p>
-        <ReactMarkdown children={props.post.content} />
-        {!props.post.published && userHasValidSession && postBelongsToUser && (
-          <button onClick={() => publishPost(props.post.id)}>Publish</button>
-        )}
-        {userHasValidSession && postBelongsToUser && (
-          <button onClick={() => deletePost(props.post.id)}>Delete</button>
-        )}
-      </div>
+      <Card variant="flat">
+        <Card.Body>
+          <h2>{title}</h2>
+          <p>By {props.post?.author?.name || "Unknown author"}</p>
+          <ReactMarkdown children={props.post.content} />
+          <Button.Group color="gradient" ghost>
+            {!props.post.published && userHasValidSession && postBelongsToUser && (
+              <Button
+                size="lg"
+                color="gradient"
+                bordered
+                onClick={() => publishPost(props.post.id)}
+              >
+                Publish
+              </Button>
+            )}
+            {userHasValidSession && postBelongsToUser && (
+              <Button
+                size="lg"
+                color="gradient"
+                bordered
+                onClick={() => deletePost(props.post.id)}
+              >
+                Delete
+              </Button>
+            )}
+          </Button.Group>
+        </Card.Body>
+      </Card>
       {status === "unauthenticated" ? null : (
         <div>
-          <form onSubmit={publishComment}>
-            <input
-              type="text"
-              placeholder="Commentaire"
-              value={comment}
-              onChange={(e) => setComment(e.currentTarget.value)}
-            />
-            <button type="submit">Envoyer</button>
-          </form>
+          <Input
+            clearable
+            contentRightStyling={false}
+            placeholder="Type your comment..."
+            value={comment}
+            onChange={(e) => setComment(e.currentTarget.value)}
+            contentRight={
+              <SendButton>
+                <SendIcon />
+              </SendButton>
+            }
+          />
+          <Button
+            size="lg"
+            color="gradient"
+            bordered
+            type="submit"
+            onClick={publishComment}
+          >
+            Envoyer
+          </Button>
         </div>
       )}
-      <div>
-        {props.jsonComments?.map((comment) => {
-          return <Comment comment={comment} key={comment.id} />;
-        })}
-      </div>
-      <style jsx>{`
-        .page {
-          background: var(--geist-background);
-          padding: 2rem;
-        }
-
-        .actions {
-          margin-top: 2rem;
-        }
-
-        button {
-          background: #ececec;
-          border: 0;
-          border-radius: 0.125rem;
-          padding: 1rem 2rem;
-        }
-
-        button + button {
-          margin-left: 1rem;
-        }
-      `}</style>
+      <Grid.Container>
+        <Grid>
+          {props.jsonComments?.map((comment) => {
+            return <Comment comment={comment} key={comment.id} />;
+          })}
+        </Grid>
+      </Grid.Container>
     </Layout>
   );
 };

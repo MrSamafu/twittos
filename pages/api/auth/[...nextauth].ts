@@ -1,10 +1,10 @@
 // pages/api/auth/[...nextauth].ts
 
-import { NextApiHandler } from 'next';
-import NextAuth from 'next-auth';
-import { PrismaAdapter } from '@next-auth/prisma-adapter';
-import GitHubProvider from 'next-auth/providers/github';
-import prisma from '../../../lib/prisma';
+import { NextApiHandler } from "next";
+import NextAuth from "next-auth";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import GitHubProvider from "next-auth/providers/github";
+import prisma from "../../../lib/prisma";
 import GoogleProvider from "next-auth/providers/google";
 
 const authHandler: NextApiHandler = (req, res) => NextAuth(req, res, options);
@@ -18,9 +18,9 @@ const options = {
     }),
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET
-    })
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    }),
   ],
   adapter: PrismaAdapter(prisma),
-  secret: process.env.GITHUB_SECRET,
+  secret: process.env.JWT_SECRET,
 };
